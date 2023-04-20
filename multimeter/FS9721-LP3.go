@@ -11,11 +11,11 @@ var (
 	CharacteristicUUID = [16]byte{0x00, 0x00, 0xff, 0xb2, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
 )
 
-type Ap90epd struct {
+type Fs9721lp3 struct {
 	Bytearray []string
 }
 
-func (m *Ap90epd) AddToByteArray(bytearray []byte) (float64, string, []string) {
+func (m *Fs9721lp3) AddToByteArray(bytearray []byte) (float64, string, []string) {
 	if len(bytearray) == 8 {
 		m.Bytearray = []string{}
 	}
@@ -34,7 +34,7 @@ func (m *Ap90epd) AddToByteArray(bytearray []byte) (float64, string, []string) {
 	return 0, "", []string{}
 }
 
-func (m *Ap90epd) proccessArray(bytearray []string) (float64, string, []string) {
+func (m *Fs9721lp3) proccessArray(bytearray []string) (float64, string, []string) {
 	str := strings.Join(bytearray, "")
 	if len(str) != 56 {
 		return 0, "", []string{}
@@ -49,7 +49,7 @@ func (m *Ap90epd) proccessArray(bytearray []string) (float64, string, []string) 
 	return value, unit, flags
 }
 
-func (m *Ap90epd) extractValue(str string) (ret float64) {
+func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 	digits := map[string]string{
 		"1111101": "0",
 		"0000101": "1",
@@ -97,7 +97,7 @@ func (m *Ap90epd) extractValue(str string) (ret float64) {
 	return
 }
 
-func (m *Ap90epd) extractUnit(str string) (unit string) {
+func (m *Fs9721lp3) extractUnit(str string) (unit string) {
 	arrUnits := [][2]interface{}{
 		{str[37:38] == "1", "n"},  // nano
 		{str[36:37] == "1", "u"},  // micro
@@ -122,7 +122,7 @@ func (m *Ap90epd) extractUnit(str string) (unit string) {
 	return
 }
 
-func (m *Ap90epd) extractFlags(str string) (flags []string) {
+func (m *Fs9721lp3) extractFlags(str string) (flags []string) {
 	arrFlags := [][2]interface{}{
 		{str[0:1] == "1", "AC"},
 		{str[1:2] == "1" && str[53:54] == "0", "DC"},

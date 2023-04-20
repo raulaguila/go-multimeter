@@ -10,7 +10,7 @@ import (
 var (
 	deviceName = "FS9721-LP3"
 	bt         = bluetooth.Bluetooth{}
-	multi      = multimeter.Ap90epd{}
+	multi      = multimeter.Fs9721lp3{}
 )
 
 func main() {
