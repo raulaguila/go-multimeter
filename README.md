@@ -23,5 +23,4 @@ This work derives heavily from the main source:
 * Install dependencies via: `go mod download`.
 * Switch on your multimeter in close proximity (~5m) to the PC.
 * Run `go run main.go`
-
-Watch terminal.
+* Watch terminal.
