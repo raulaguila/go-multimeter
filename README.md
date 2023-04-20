@@ -1,4 +1,4 @@
-# Go - Multimeter BLE
+# Go - BLE Multimeter
 
 Get BLE Multimeter data to PC. With approx 2 samples per second (in DC Volt mode).
 
