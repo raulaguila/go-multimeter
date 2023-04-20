@@ -1,7 +1,5 @@
 # Go - Multimeter BLE
 
-## Connect to Bluetooth Multimeter
-
 Get BLE Multimeter data to PC. With approx 2 samples per second (in DC Volt mode).
 
 Works with FS9721-LP3 based Bluetooth Multimeters, including:
