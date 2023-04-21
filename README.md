@@ -8,7 +8,7 @@ Works with FS9721-LP3 based Bluetooth Multimeters, including:
 * Infurider YF-90EPD
 * HoldPeak HP-90EPD
 
-![](/img/example.png)
+![](/screenshot/example.png)
 
 Tested with Linux using golang 1.20.3.
 

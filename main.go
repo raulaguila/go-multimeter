@@ -31,7 +31,7 @@ func Fs9721lp3() {
 	log.Println("ready!")
 	go func() {
 		for bt.Connected() {
-			val, unit, flags := multi_fs9721lp3.AddToByteArray(<-bt.ChReceived)
+			val, unit, flags := multi_fs9721lp3.Proccess(<-bt.ChReceived)
 			if unit != "" {
 				log.Printf("%v %v %v\n", val, unit, flags)
 			}

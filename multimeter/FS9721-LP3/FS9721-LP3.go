@@ -16,7 +16,7 @@ type Fs9721lp3 struct {
 	Bytearray []string
 }
 
-func (m *Fs9721lp3) AddToByteArray(bytearray []byte) (float64, string, []string) {
+func (m *Fs9721lp3) Proccess(bytearray []byte) (float64, string, []string) {
 	if len(bytearray) == 8 {
 		m.Bytearray = m.Bytearray[:0]
 	}
@@ -46,7 +46,6 @@ func (m *Fs9721lp3) proccessArray(bytearray []string) (float64, string, []string
 	flags := m.extractFlags(str)
 
 	// log.Printf("%v %v %v\n", value, unit, flags)
-
 	return value, unit, flags
 }
 
