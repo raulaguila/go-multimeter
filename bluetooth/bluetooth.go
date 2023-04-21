@@ -41,7 +41,6 @@ func (b *Bluetooth) Disconnect() (err error) {
 
 	if b.connected {
 		b.connected = false
-		b.adapter.StopScan()
 		err = b.device.Disconnect()
 	}
 
@@ -74,7 +73,8 @@ func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err
 	}
 
 	if len(b.srvcs) == 0 {
-		return errors.New("could not find heart rate service")
+		err = errors.New("could not find heart rate service")
+		return
 	}
 
 	b.chars, err = b.srvcs[0].DiscoverCharacteristics([]bluetooth.UUID{bluetooth.NewUUID(CharacteristicUUID)})
@@ -83,7 +83,8 @@ func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err
 	}
 
 	if len(b.chars) == 0 {
-		return errors.New("could not find heart rate characteristic")
+		err = errors.New("could not find heart rate characteristic")
+		return
 	}
 
 	b.ChReceived = make(chan []byte, 1)

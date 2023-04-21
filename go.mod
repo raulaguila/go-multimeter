@@ -1,4 +1,4 @@
-module AP-90EPD
+module github.com/raulaguila/go-multimeter
 
 go 1.20
 
