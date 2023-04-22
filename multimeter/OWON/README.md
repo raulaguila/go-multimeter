@@ -38,7 +38,7 @@ Tested with Owon - OW18E multimeter
 
 * ### 2nd byte (8 digits, ex: [11110000])
 
-    * Digits (0, 1, 2, 3): Apparently they are not used [\*](####ps)
+    * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents the function
 
         | 1-4  | func | 5-8  | func        |
@@ -50,7 +50,7 @@ Tested with Owon - OW18E multimeter
 
 * ### 3rd byte (8 digits, ex: [00000100])
 
-    * Digits (0, 1, 2, 3): Apparently they are not used [\*](####ps)
+    * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents if the multimeter is in automatic range
 
         | 1-4  | func | 5-8  | func     |
@@ -60,7 +60,7 @@ Tested with Owon - OW18E multimeter
 
 * ### 4th byte (8 digits, ex: [00000000])
 
-    * Apparently this byte is not used [\*](####ps)
+    * Apparently this byte is not used [*](#ps)
 
 * ### 5th and 6th bytes (8 digits each, ex: [50 128])
 
@@ -87,6 +87,6 @@ Tested with Owon - OW18E multimeter
         | AC + Resistance      | Capacitance Measure | F     |
         | Diod + Voltage       | Current Measure     | A     |
 
-#### PS 
+* #### PS
 
     * \* Maybe the unused data are used to represent other information that was not tracked, such as low battery, MIN, MAX, and others.
