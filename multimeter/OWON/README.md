@@ -18,7 +18,7 @@ Tested with Owon - OW18E multimeter
     * Digits (2, 3, 4): Represents the unit of measure
     * Digits (5, 6, 7): Represents the range of the measured value
 
-        | 1-2 | func | 3-5 | unit | 6-8 | range |
+        | 0-1 | func | 2-4 | unit | 5-7 | range |
         | --- | ---  | --- | ---  | --- | ---   |
         | 00  | DC   | -   | -    | -   | -     |
         | 01  | AC   | -   | -    | -   | -     |
@@ -41,7 +41,7 @@ Tested with Owon - OW18E multimeter
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents the function
 
-        | 1-4  | func | 5-8  | func        |
+        | 0-3  | func | 4-7  | func        |
         | ---  | ---  | ---  | ---         |
         | 1111 | -    | 0000 | Voltage     |
         | -    | -    | 0001 | Resistance  |
@@ -53,7 +53,7 @@ Tested with Owon - OW18E multimeter
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents if the multimeter is in automatic range
 
-        | 1-4  | func | 5-8  | func     |
+        | 0-3  | func | 4-7  | func     |
         | ---  | ---  | ---  | ---      |
         | 0000 | -    | 0100 | Auto ON  |
         | -    | -    | 0000 | Auto OFF |
