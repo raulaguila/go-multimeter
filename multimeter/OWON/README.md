@@ -9,11 +9,12 @@ Tested with Owon - OW18E multimeter
 * ### Example message:
 
     * Receive a slice of byte with five positions
-    * Example received message: [27 240 4 0 50 128]
-    * Convert to 8 digits binary: [00011011 11110000 00000100 00000000 00110010 10000000]
+    * Example received message: [27 240 4 0 [50 128](#5th--6th-bytes)]
+    * Convert to 8 digits binary: [[00011011](#1st-byte) [11110000](#2nd-byte) [00000100](#3rd-byte) [00000000](#4th-byte) 00110010 10000000]
 
-* ### 1st byte (8 digits, ex: [00011011])
+* ### 1st byte
 
+    * 8 digits, ex: [00011011](#example-message)
     * Digits (0, 1): Represents the function
     * Digits (2, 3, 4): Represents the unit of measure
     * Digits (5, 6, 7): Represents the range of the measured value
@@ -36,8 +37,9 @@ Tested with Owon - OW18E multimeter
         | -   | -    | -   | -    | 100 | 2     |
         | -   | -    | -   | -    | 111 | L     |
 
-* ### 2nd byte (8 digits, ex: [11110000])
+* ### 2nd byte
 
+    * 8 digits, ex: [11110000](#example-message)
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents the function
 
@@ -48,8 +50,9 @@ Tested with Owon - OW18E multimeter
         | -    | -    | 0010 | Continuity  |
         | -    | -    | 0100 | Capacitance |
 
-* ### 3rd byte (8 digits, ex: [00000100])
+* ### 3rd byte
 
+    * 8 digits, ex: [00000100](#example-message)
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents if the multimeter is in automatic range
 
@@ -58,12 +61,14 @@ Tested with Owon - OW18E multimeter
         | 0000 | -    | 0100 | Auto ON  |
         | -    | -    | 0000 | Auto OFF |
 
-* ### 4th byte (8 digits, ex: [00000000])
+* ### 4th byte
 
+    * 8 digits, ex: [00000000](#example-message)
     * Apparently this byte is not used [*](#ps)
 
-* ### 5th and 6th bytes (8 digits each, ex: [50 128])
+* ### 5th & 6th bytes
 
+    * Ex: [\[50 128\]](#example-message)
     * Represents the measurement value
     * Use them without converting to binary
     * 6th byte counts the overflow of 5th byte
@@ -74,18 +79,18 @@ Tested with Owon - OW18E multimeter
     * Combining the first byte and second byte items, we have the final function
     * First two characters of first byte with last four characters of second byte
 
-        | Conbination          | Final function      | unity |
-        | ---                  | ---                 | ---   |
-        | DC + Continuity      | Temperature         | ºC    |
-        | AC + Continuity      | Temperature         | ºF    |
-        | Cont + Continuity    | Continuity test     | Ω     |
-        | Diod + Continuity    | Diode test          | V     |
-        | Diod + Resistance    | Frequence           | Hz    |
-        | DC + Voltage         | DC Voltage Measure  | V     |
-        | AC + Voltage         | AC Voltage Measure  | V     |
-        | DC + Resistance      | Resistance Measure  | Ω     |
-        | AC + Resistance      | Capacitance Measure | F     |
-        | Diod + Voltage       | Current Measure     | A     |
+        | Conbination                                 | Final function      | unity |
+        | ---                                         | ---                 | ---   |
+        | [DC](#1st-byte) + [Continuity](#2nd-byte)   | Temperature         | ºC    |
+        | [AC](#1st-byte) + [Continuity](#2nd-byte)   | Temperature         | ºF    |
+        | [Cont](#1st-byte) + [Continuity](#2nd-byte) | Continuity test     | Ω     |
+        | [Diod](#1st-byte) + [Continuity](#2nd-byte) | Diode test          | V     |
+        | [Diod](#1st-byte) + [Resistance](#2nd-byte) | Frequence           | Hz    |
+        | [DC](#1st-byte) + [Voltage](#2nd-byte)      | DC Voltage Measure  | V     |
+        | [AC](#1st-byte) + [Voltage](#2nd-byte)      | AC Voltage Measure  | V     |
+        | [DC](#1st-byte) + [Resistance](#2nd-byte)   | Resistance Measure  | Ω     |
+        | [AC](#1st-byte) + [Resistance](#2nd-byte)   | Capacitance Measure | F     |
+        | [Diod](#1st-byte) + [Voltage](#2nd-byte)    | Current Measure     | A     |
 
 * #### PS
 
