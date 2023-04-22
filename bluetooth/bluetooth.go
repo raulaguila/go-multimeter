@@ -2,6 +2,8 @@ package bluetooth
 
 import (
 	"errors"
+	"fmt"
+	"log"
 
 	"tinygo.org/x/bluetooth"
 )
@@ -25,7 +27,6 @@ func (b *Bluetooth) find(deviceName string) {
 	b.chScan = make(chan bluetooth.ScanResult, 1)
 	go b.adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
 		if result.LocalName() == deviceName {
-			// log.Println(result, result.LocalName())
 			adapter.StopScan()
 			b.chScan <- result
 		}
@@ -57,6 +58,39 @@ func (b *Bluetooth) Connect(deviceName string) (err error) {
 	}
 
 	return
+}
+
+func (b *Bluetooth) StopScan() error {
+	return b.adapter.StopScan()
+}
+
+func (b *Bluetooth) ScanDevices() {
+	go b.adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
+		log.Println(result, result.LocalName())
+	})
+}
+
+func (b *Bluetooth) ListUUIDs() error {
+	srvcs, err := b.device.DiscoverServices(nil)
+	if err != nil {
+		return err
+	}
+
+	for _, srvc := range srvcs {
+		fmt.Printf("Service UUID: %v\n", srvc.UUID())
+		char, err := srvc.DiscoverCharacteristics(nil)
+		if err != nil {
+			return err
+		}
+
+		for _, c := range char {
+			fmt.Printf(" - Characteristic UUID: %v\n", c.UUID())
+		}
+
+		fmt.Println("")
+	}
+
+	return nil
 }
 
 func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err error) {

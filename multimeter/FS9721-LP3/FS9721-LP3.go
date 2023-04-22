@@ -16,7 +16,7 @@ type Fs9721lp3 struct {
 	Bytearray []string
 }
 
-func (m *Fs9721lp3) Proccess(bytearray []byte) (float64, string, []string) {
+func (m *Fs9721lp3) AddToByteArray(bytearray []byte) (float64, string, []string) {
 	if len(bytearray) == 8 {
 		m.Bytearray = m.Bytearray[:0]
 	}
@@ -46,6 +46,7 @@ func (m *Fs9721lp3) proccessArray(bytearray []string) (float64, string, []string
 	flags := m.extractFlags(str)
 
 	// log.Printf("%v %v %v\n", value, unit, flags)
+
 	return value, unit, flags
 }
 
@@ -65,7 +66,7 @@ func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 		"1101000": "L",
 	}
 
-	arrValues := []string{
+	arrDigits := []string{
 		str[5:12],  // Digito 01
 		str[12:13], // Ponto 01
 		str[13:20], // Digito 02
@@ -75,15 +76,15 @@ func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 		str[29:36], // Digito 04
 	}
 
-	var value string
-	for i, item := range arrValues {
+	value := "0"
+	for i, digit := range arrDigits {
 		switch i % 2 {
 		case 0:
-			if val, exist := digits[item]; exist {
+			if val, exist := digits[digit]; exist {
 				value += val
 			}
 		case 1:
-			if item == "1" {
+			if digit == "1" {
 				value += "."
 			}
 		}
@@ -100,7 +101,7 @@ func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 func (m *Fs9721lp3) extractUnit(str string) (unit string) {
 	arrUnits := [][2]interface{}{
 		{str[37:38] == "1", "n"},  // nano
-		{str[36:37] == "1", "u"},  // micro
+		{str[36:37] == "1", "µ"},  // micro
 		{str[38:39] == "1", "k"},  // kilo
 		{str[40:41] == "1", "m"},  // mili
 		{str[42:43] == "1", "M"},  // mega
@@ -137,9 +138,9 @@ func (m *Fs9721lp3) extractFlags(str string) (flags []string) {
 		{str[51:52] == "1", "LowBat"},
 	}
 
-	for _, item := range arrFlags {
-		if item[0].(bool) {
-			flags = append(flags, item[1].(string))
+	for _, flag := range arrFlags {
+		if flag[0].(bool) {
+			flags = append(flags, flag[1].(string))
 		}
 	}
 
