@@ -87,6 +87,6 @@ Tested with Owon - OW18E multimeter
         | AC + Resistance      | Capacitance Measure | F     |
         | Diod + Voltage       | Current Measure     | A     |
 
-* #### PS 
+#### PS 
 
     * \* Maybe the unused data are used to represent other information that was not tracked, such as low battery, MIN, MAX, and others.
