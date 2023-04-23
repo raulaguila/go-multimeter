@@ -76,7 +76,7 @@ func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 		str[29:36], // Digito 04
 	}
 
-	value := ""
+	value := "0"
 	for i, digit := range arrDigits {
 		switch i % 2 {
 		case 0:
