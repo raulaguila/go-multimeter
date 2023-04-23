@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/raulaguila/go-multimeter/bluetooth"
 	fs9721 "github.com/raulaguila/go-multimeter/multimeter/FS9721-LP3"
@@ -18,7 +20,9 @@ func startBT(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byt
 		panic(err)
 	}
 
-	if err := bt.Connect(deviceName); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := bt.Connect(ctx, deviceName); err != nil {
 		panic(err)
 	}
 

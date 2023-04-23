@@ -1,6 +1,7 @@
 package bluetooth
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -48,11 +49,20 @@ func (b *Bluetooth) Disconnect() (err error) {
 	return
 }
 
-func (b *Bluetooth) Connect(deviceName string) (err error) {
+func (b *Bluetooth) Connect(ctx context.Context, deviceName string) (err error) {
 	err = nil
 	if !b.connected {
 		b.find(deviceName)
-		device := <-b.chScan
+
+		var device bluetooth.ScanResult
+		select {
+		case <-ctx.Done():
+			b.adapter.StopScan()
+			err = ctx.Err()
+			return
+		case device = <-b.chScan:
+		}
+
 		b.device, err = b.adapter.Connect(device.Address, bluetooth.ConnectionParams{})
 		b.connected = err == nil
 	}
