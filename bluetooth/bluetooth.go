@@ -114,7 +114,7 @@ func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err
 	}
 
 	if len(b.srvcs) == 0 {
-		err = errors.New("could not find heart rate service")
+		err = errors.New("could not find service")
 		return
 	}
 
@@ -124,7 +124,7 @@ func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err
 	}
 
 	if len(b.chars) == 0 {
-		err = errors.New("could not find heart rate characteristic")
+		err = errors.New("could not find characteristic")
 		return
 	}
 
