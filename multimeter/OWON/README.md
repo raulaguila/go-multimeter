@@ -19,23 +19,14 @@ Tested with Owon - OW18E multimeter
     * Digits (2, 3, 4): Represents the unit of measure
     * Digits (5, 6, 7): Represents the range of the measured value
 
-        | 0-1 | func | 2-4 | unit | 5-7 | range |
-        | --- | ---  | --- | ---  | --- | ---   |
-        | 00  | DC   | -   | -    | -   | -     |
-        | 01  | AC   | -   | -    | -   | -     |
-        | 10  | Diod | -   | -    | -   | -     |
-        | 11  | Cont | -   | -    | -   | -     |
-        | -   | -    | 001 | n    | -   | -     |
-        | -   | -    | 010 | µ    | -   | -     |
-        | -   | -    | 011 | m    | -   | -     |
-        | -   | -    | 100 | 1    | -   | -     |
-        | -   | -    | 101 | k    | -   | -     |
-        | -   | -    | 110 | M    | -   | -     |
-        | -   | -    | -   | -    | 001 | 2000  |
-        | -   | -    | -   | -    | 010 | 200   |
-        | -   | -    | -   | -    | 011 | 20    |
-        | -   | -    | -   | -    | 100 | 2     |
-        | -   | -    | -   | -    | 111 | L     |
+        | 0-1 | func | -   | 2-4 | unit | -   | 5-7 | range |
+        | --- | ---  | --- | --- | ---  | --- | --- | ---   |
+        | 00  | DC   |     | 001 | n    |     | 001 | 2000  |
+        | 01  | AC   |     | 010 | µ    |     | 010 | 200   |
+        | 10  | Diod |     | 011 | m    |     | 011 | 20    |
+        | 11  | Cont |     | 100 | 1    |     | 100 | 2     |
+        |     |      |     | 101 | k    |     | 111 | L     |
+        |     |      |     | 110 | M    |     |     |       |
 
 * ### 2nd byte
 
@@ -46,9 +37,9 @@ Tested with Owon - OW18E multimeter
         | 0-3  | func | 4-7  | func        |
         | ---  | ---  | ---  | ---         |
         | 1111 | -    | 0000 | Voltage     |
-        | -    | -    | 0001 | Resistance  |
-        | -    | -    | 0010 | Continuity  |
-        | -    | -    | 0100 | Capacitance |
+        |      |      | 0001 | Resistance  |
+        |      |      | 0010 | Continuity  |
+        |      |      | 0100 | Capacitance |
 
 * ### 3rd byte
 
@@ -59,7 +50,7 @@ Tested with Owon - OW18E multimeter
         | 0-3  | func | 4-7  | func     |
         | ---  | ---  | ---  | ---      |
         | 0000 | -    | 0100 | Auto ON  |
-        | -    | -    | 0000 | Auto OFF |
+        |      |      | 0000 | Auto OFF |
 
 * ### 4th byte
 
