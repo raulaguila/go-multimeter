@@ -34,12 +34,12 @@ Tested with Owon - OW18E multimeter
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents the function
 
-        | 0-3  | func | 4-7  | func        |
-        | ---  | ---  | ---  | ---         |
-        | 1111 | -    | 0000 | Voltage     |
-        |      |      | 0001 | Resistance  |
-        |      |      | 0010 | Continuity  |
-        |      |      | 0100 | Capacitance |
+        | 0-3  | func | -   | 4-7  | func        |
+        | ---  | ---  | --- | ---  | ---         |
+        | 1111 | -    |     | 0000 | Voltage     |
+        |      |      |     | 0001 | Resistance  |
+        |      |      |     | 0010 | Continuity  |
+        |      |      |     | 0100 | Capacitance |
 
 * ### 3rd byte
 
@@ -47,10 +47,10 @@ Tested with Owon - OW18E multimeter
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
     * Digits (4, 5, 6, 7): Represents if Auto is enabled
 
-        | 0-3  | func | 4-7  | func     |
-        | ---  | ---  | ---  | ---      |
-        | 0000 | -    | 0100 | Auto ON  |
-        |      |      | 0000 | Auto OFF |
+        | 0-3  | func | -   | 4-7  | func     |
+        | ---  | ---  | --- | ---  | ---      |
+        | 0000 | -    |     | 0100 | Auto ON  |
+        |      |      |     | 0000 | Auto OFF |
 
 * ### 4th byte
 
