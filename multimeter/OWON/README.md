@@ -85,4 +85,4 @@ Tested with Owon - OW18E multimeter
 
 * #### PS
 
-    * \* Maybe the unused data are used to represent other information that was not tracked, such as low battery, MIN, MAX, and others.
+    [\*](#ps) Maybe the unused data are used to represent other information that was not tracked, such as low battery, MIN, MAX, and others.
