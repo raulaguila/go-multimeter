@@ -54,17 +54,14 @@ func (b *Bluetooth) Connect(ctx context.Context, deviceName string) (err error) 
 	if !b.connected {
 		b.find(deviceName)
 
-		var device bluetooth.ScanResult
 		select {
 		case <-ctx.Done():
 			b.adapter.StopScan()
 			err = ctx.Err()
-			return
-		case device = <-b.chScan:
+		case device := <-b.chScan:
+			b.device, err = b.adapter.Connect(device.Address, bluetooth.ConnectionParams{})
+			b.connected = err == nil
 		}
-
-		b.device, err = b.adapter.Connect(device.Address, bluetooth.ConnectionParams{})
-		b.connected = err == nil
 	}
 
 	return
