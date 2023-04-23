@@ -25,10 +25,10 @@ func (b *Bluetooth) Enable() error {
 
 func (b *Bluetooth) find(deviceName string) {
 	b.chScan = make(chan bluetooth.ScanResult, 1)
-	go b.adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
-		if result.LocalName() == deviceName {
+	go b.adapter.Scan(func(adapter *bluetooth.Adapter, device bluetooth.ScanResult) {
+		if device.LocalName() == deviceName {
 			adapter.StopScan()
-			b.chScan <- result
+			b.chScan <- device
 		}
 	})
 }
@@ -52,8 +52,8 @@ func (b *Bluetooth) Connect(deviceName string) (err error) {
 	err = nil
 	if !b.connected {
 		b.find(deviceName)
-		result := <-b.chScan
-		b.device, err = b.adapter.Connect(result.Address, bluetooth.ConnectionParams{})
+		device := <-b.chScan
+		b.device, err = b.adapter.Connect(device.Address, bluetooth.ConnectionParams{})
 		b.connected = err == nil
 	}
 

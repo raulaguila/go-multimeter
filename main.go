@@ -56,11 +56,18 @@ func Ow18e() {
 }
 
 func main() {
+	if len(os.Args) == 1 {
+		log.Println("Pass argument: \"fs9721\" or \"ow18e\"")
+		return
+	}
+
 	switch strings.TrimSpace(strings.ToLower(os.Args[1])) {
 	case "fs9721":
 		Fs9721lp3()
 	case "ow18e":
 		Ow18e()
+	default:
+		log.Println("Invalid argument! valid argument: \"fs9721\" or \"ow18e\"")
 	}
 
 	if bt.Connected() {
