@@ -78,23 +78,26 @@ func (m *OW18E) extractUnit(bytearray []byte) (unit string) {
 	firstByte := m.toBintString(bytearray[0])
 	secondByte := m.toBintString(bytearray[1])
 
+	unitRepresentation := firstByte[2:5]
+	finalFunction := firstByte[0:2] + secondByte[4:]
+
 	arrUnits := [][2]interface{}{
-		{firstByte[2:5] == nano, "n"},                            // nano
-		{firstByte[2:5] == micro, "µ"},                           // micro
-		{firstByte[2:5] == mili, "m"},                            // mili
-		{firstByte[2:5] == one, ""},                              // 1
-		{firstByte[2:5] == kilo, "k"},                            // kilo
-		{firstByte[2:5] == mega, "M"},                            // Mega
-		{firstByte[0:2]+secondByte[4:] == dc+continuity, "ºC"},   // Temp celsius
-		{firstByte[0:2]+secondByte[4:] == dc+voltage, "V"},       // DC Voltage Measure
-		{firstByte[0:2]+secondByte[4:] == dc+resistance, "Ω"},    // Resistance Measure
-		{firstByte[0:2]+secondByte[4:] == ac+continuity, "ºF"},   // Temp fahrenheit
-		{firstByte[0:2]+secondByte[4:] == ac+resistance, "F"},    // Capacitance Measure
-		{firstByte[0:2]+secondByte[4:] == ac+voltage, "V"},       // AC Voltage Measure
-		{firstByte[0:2]+secondByte[4:] == diod+continuity, "V"},  // Diode test
-		{firstByte[0:2]+secondByte[4:] == diod+resistance, "Hz"}, // Frequence
-		{firstByte[0:2]+secondByte[4:] == diod+voltage, "A"},     // Current Measure
-		{firstByte[0:2]+secondByte[4:] == cont+continuity, "Ω"},  // Continuity test
+		{unitRepresentation == nano, "n"},        // nano
+		{unitRepresentation == micro, "µ"},       // micro
+		{unitRepresentation == mili, "m"},        // mili
+		{unitRepresentation == one, ""},          // 1
+		{unitRepresentation == kilo, "k"},        // kilo
+		{unitRepresentation == mega, "M"},        // Mega
+		{finalFunction == dc+continuity, "ºC"},   // Temp celsius
+		{finalFunction == dc+voltage, "V"},       // DC Voltage Measure
+		{finalFunction == dc+resistance, "Ω"},    // Resistance Measure
+		{finalFunction == ac+continuity, "ºF"},   // Temp fahrenheit
+		{finalFunction == ac+resistance, "F"},    // Capacitance Measure
+		{finalFunction == ac+voltage, "V"},       // AC Voltage Measure
+		{finalFunction == diod+continuity, "V"},  // Diode test
+		{finalFunction == diod+resistance, "Hz"}, // Frequence
+		{finalFunction == diod+voltage, "A"},     // Current Measure
+		{finalFunction == cont+continuity, "Ω"},  // Continuity test
 	}
 
 	for _, item := range arrUnits {
@@ -111,14 +114,17 @@ func (m *OW18E) extractFlags(bytearray []byte) (flags []string) {
 	secondByte := m.toBintString(bytearray[1])
 	thirdByte := m.toBintString(bytearray[2])
 
+	funcRepresentation := firstByte[0:2]
+	finalFunction := funcRepresentation + secondByte[4:]
+
 	arrFlags := [][2]interface{}{
-		{firstByte[0:2] == dc, "DC"},                                          // DC Voltage Measure
-		{firstByte[0:2] == ac, "AC"},                                          // AC Voltage Measure
-		{thirdByte[4:] == auto, "Auto"},                                       // Auto range
-		{firstByte[0:2]+secondByte[4:] == dc+continuity, "Temp celsius"},      // Temp celsius
-		{firstByte[0:2]+secondByte[4:] == ac+continuity, "Temp fahrenheit"},   // Temp fahrenheit
-		{firstByte[0:2]+secondByte[4:] == diod+continuity, "Diode test"},      // Diode test
-		{firstByte[0:2]+secondByte[4:] == cont+continuity, "Continuity test"}, // Continuity test
+		{funcRepresentation == dc, "DC"},                      // DC Voltage Measure
+		{funcRepresentation == ac, "AC"},                      // AC Voltage Measure
+		{thirdByte[4:] == auto, "Auto"},                       // Auto range
+		{finalFunction == dc+continuity, "Temp celsius"},      // Temp celsius
+		{finalFunction == ac+continuity, "Temp fahrenheit"},   // Temp fahrenheit
+		{finalFunction == diod+continuity, "Diode test"},      // Diode test
+		{finalFunction == cont+continuity, "Continuity test"}, // Continuity test
 	}
 
 	for _, flag := range arrFlags {
