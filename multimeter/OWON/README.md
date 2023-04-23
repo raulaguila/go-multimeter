@@ -45,7 +45,7 @@ Tested with Owon - OW18E multimeter
 
     * 8 digits, ex: [00000100](#example-message)
     * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
-    * Digits (4, 5, 6, 7): Represents if the multimeter is in automatic range
+    * Digits (4, 5, 6, 7): Represents if Auto is enabled
 
         | 0-3  | func | 4-7  | func     |
         | ---  | ---  | ---  | ---      |
