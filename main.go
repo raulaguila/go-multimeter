@@ -14,6 +14,10 @@ import (
 var bt = bluetooth.Bluetooth{}
 
 func startBT(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byte) {
+	if err := bt.Enable(); err != nil {
+		panic(err)
+	}
+
 	if err := bt.Connect(deviceName); err != nil {
 		panic(err)
 	}
@@ -52,10 +56,6 @@ func Ow18e() {
 }
 
 func main() {
-	if err := bt.Enable(); err != nil {
-		panic(err)
-	}
-
 	switch strings.TrimSpace(strings.ToLower(os.Args[1])) {
 	case "fs9721":
 		Fs9721lp3()
