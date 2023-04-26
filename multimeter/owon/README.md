@@ -9,8 +9,8 @@ Tested with Owon - OW18E multimeter
 * ### Example message:
 
     * Receive a slice of byte with five positions
-    * Example received message: [27 240 4 0 [50 128](#5th--6th-bytes)]
-    * Convert to 8 digits binary: [[00011011](#1st-byte) [11110000](#2nd-byte) [00000100](#3rd-byte) [00000000](#4th-byte) 00110010 10000000]
+    * Example received message: [ 27 240 4 0 [50 128](#5th--6th-bytes) ]
+    * Convert to 8 digits binary: [ [00011011](#1st-byte) [11110000](#2nd-byte) [00000100](#3rd-byte) [00000000](#4th-byte) 00110010 10000000 ]
 
 * ### 1st byte
 
