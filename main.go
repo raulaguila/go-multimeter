@@ -62,7 +62,7 @@ func ow18e() {
 
 func main() {
 	if len(os.Args) == 1 {
-		log.Println("Pass argument: \"fs9721\" or \"ow18e\"")
+		log.Println("Required argument: \"fs9721\" or \"ow18e\"")
 		return
 	}
 
