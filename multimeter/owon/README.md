@@ -67,10 +67,10 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
     * 6th byte counts the overflow of 5th byte
     * If the 5th byte >= 128, it is a negative value
 
-* ### Combinations
+* ### Final function
 
-    * Combining the first byte and second byte items, we have the final function
-    * First two characters of first byte with last four characters of second byte
+    * Combining the first and second byte items, it has the final function
+    * First two characters of first byte with last four of second
 
         | Conbination                                 | Final function      | unity |
         | ---                                         | ---                 | ---   |

@@ -99,6 +99,7 @@ func (m *OW18E) extractUnit() (unit string) {
 		{finalFunction == ac+continuity, "ºF"},   // Temp fahrenheit
 		{finalFunction == ac+resistance, "F"},    // Capacitance Measure
 		{finalFunction == ac+voltage, "V"},       // AC Voltage Measure
+		{finalFunction == ac+ncv, "NVC"},         // Percentage
 		{finalFunction == diod+continuity, "V"},  // Diode test
 		{finalFunction == diod+resistance, "Hz"}, // Frequence
 		{finalFunction == diod+voltage, "A"},     // Current Measure
