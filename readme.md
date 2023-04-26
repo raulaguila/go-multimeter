@@ -10,6 +10,6 @@ Tested with Linux using golang 1.20.3.
 
 * Download dependencies: `go mod download`.
 * Switch on your multimeter in close proximity (~4m) to the PC.
-* Run `go run main.go <ow18e or fs9721>`
+* Run: `go run main.go <ow18e or fs9721>`
 * Watch terminal.
 * Press **ENTER** to disconnect bluetooth and close the program.
