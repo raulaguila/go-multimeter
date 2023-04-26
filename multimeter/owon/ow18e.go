@@ -37,13 +37,13 @@ func (m *OW18E) getBinArray() []string {
 	return str
 }
 
-func (m *OW18E) ProccessArray(bytearray []byte, printArray bool) (float64, string, []string) {
+func (m *OW18E) ProccessArray(bytearray []byte, printArray bool) (value float64, unit string, flags []string) {
 	m.bytearray = bytearray
 	m.binarray = m.getBinArray()
 
-	value := m.extractValue()
-	unit := m.extractUnit()
-	flags := m.extractFlags()
+	value = m.extractValue()
+	unit = m.extractUnit()
+	flags = m.extractFlags()
 
 	if printArray {
 		log.Printf("%v <-> %v <-> %v %v %v\n", m.binarray, m.bytearray, value, unit, flags)

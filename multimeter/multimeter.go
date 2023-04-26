@@ -1,5 +1,5 @@
 package multimeter
 
 type Multimeter interface {
-	ProccessArray(bytearray []byte, printArray bool) (float64, string, []string)
+	ProccessArray(bytearray []byte, printArray bool) (value float64, unit string, flags []string)
 }

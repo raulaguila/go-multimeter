@@ -12,18 +12,13 @@ type Fs9721 struct {
 	originalarray []byte
 }
 
-func (m *Fs9721) ProccessArray(bytearray []byte, printArray bool) (float64, string, []string) {
-	if len(bytearray) == 8 {
+func (m *Fs9721) ProccessArray(bytearray []byte, printArray bool) (value float64, unit string, flags []string) {
+	switch len(bytearray) {
+	case 8:
 		m.bytearray = m.bytearray[:0]
 		m.originalarray = m.originalarray[:0]
-	}
-
-	value := 0.0
-	unit := ""
-	flags := []string{}
-
-	switch len(bytearray) {
-	case 6, 8:
+		fallthrough
+	case 6:
 		for _, b := range bytearray {
 			aux := fmt.Sprintf("%08b", b)
 			m.bytearray = append(m.bytearray, aux[len(aux)-4:])
@@ -32,10 +27,9 @@ func (m *Fs9721) ProccessArray(bytearray []byte, printArray bool) (float64, stri
 
 		if len(m.bytearray) == 14 {
 			value, unit, flags = m.proccessArray()
-		}
-
-		if len(m.bytearray) == 14 && printArray {
-			log.Printf("%v <-> %v <-> %v %v %v\n", m.bytearray, m.originalarray, value, unit, flags)
+			if printArray {
+				log.Printf("%v <-> %v <-> %v %v %v\n", m.bytearray, m.originalarray, value, unit, flags)
+			}
 		}
 	}
 
