@@ -79,6 +79,6 @@ func main() {
 		log.Println("Press <ENTER> to exit")
 		bufio.NewScanner(os.Stdin).Scan()
 		bt.Disconnect()
-		log.Println("Desconnected!!")
+		log.Println("Disconnected!!")
 	}
 }
