@@ -72,7 +72,7 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 ### Final function
 
 * Combining the 1st and 2nd byte items, it has the final function.
-* [`First two bits of 1st byte`](#1st-byte) + [`last two of 2nd`](#2nd-byte).
+* [First two bits of 1st byte](#1st-byte) + [last two of 2nd](#2nd-byte).
 
     | 1st Byte | 2nd Byte   | Final function      | Symbol |
     | ---:     | :---       | :---                | :---:  |
