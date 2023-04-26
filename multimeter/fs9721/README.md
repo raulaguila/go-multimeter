@@ -1,5 +1,7 @@
 # Bluetooth communication protocol
 
+Tested with [AOPUTTRIVER AP-90EPD Digital Multimeter](https://www.amazon.ca/AOPUTTRIVER-Auto-ranging-Resistance-Capacitance-Temperature/dp/B07PB6XKJW)
+
 Works with FS9721-LP3 based Bluetooth Multimeters, including:
 
 * AOPUTTRIVER AP-90EPD

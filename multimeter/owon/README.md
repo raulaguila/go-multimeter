@@ -2,7 +2,7 @@
 
 This work was carried using bluetooth to connect to the multimeter and tracking the message bytes in each multimeter function.
 
-Tested with Owon - OW18E multimeter
+Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_ow18d%7Ce_4_1%7C2_digits__handheld_digital_multimeter)
 
 ![](/screenshot/ow18e.png)
 
