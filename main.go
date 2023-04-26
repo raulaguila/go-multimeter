@@ -9,8 +9,9 @@ import (
 	"time"
 
 	"github.com/raulaguila/go-multimeter/bluetooth"
-	fs9721 "github.com/raulaguila/go-multimeter/multimeter/FS9721-LP3"
-	owon "github.com/raulaguila/go-multimeter/multimeter/OWON"
+	"github.com/raulaguila/go-multimeter/multimeter"
+	"github.com/raulaguila/go-multimeter/multimeter/fs9721"
+	"github.com/raulaguila/go-multimeter/multimeter/owon"
 )
 
 var bt = bluetooth.Bluetooth{}
@@ -31,32 +32,32 @@ func startBT(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byt
 	}
 }
 
-func Fs9721lp3() {
-	startBT(fs9721.DeviceName, fs9721.ServiceUUID, fs9721.CharacteristicUUID)
-
-	go func() {
-		fs9721 := fs9721.Fs9721lp3{}
-		log.Println("[FS9721_LP3] Ready!")
+func startParser(m multimeter.Multimeter) {
+	go func(printArray bool) {
 		for bt.Connected() {
-			val, unit, flags := fs9721.AddToByteArray(<-bt.ChReceived)
+			if printArray {
+				go m.ProccessArray(<-bt.ChReceived, printArray)
+				continue
+			}
+
+			val, unit, flags := m.ProccessArray(<-bt.ChReceived, printArray)
 			if unit != "" {
 				log.Printf("%v %v %v\n", val, unit, flags)
 			}
 		}
-	}()
+	}(false)
 }
 
-func Ow18e() {
-	startBT(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicUUID)
+func fs9721lp3() {
+	startBT(fs9721.DeviceName, fs9721.ServiceUUID, fs9721.CharacteristicUUID)
+	log.Println("[FS9721_LP3] Ready!")
+	startParser(&fs9721.Fs9721{})
+}
 
-	go func() {
-		ow18 := owon.OW18E{}
-		log.Println("[OW18E] Ready!")
-		for bt.Connected() {
-			val, unit, flags := ow18.ProccessArray(<-bt.ChReceived)
-			log.Printf("%v %v %v\n", val, unit, flags)
-		}
-	}()
+func ow18e() {
+	startBT(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicUUID)
+	log.Println("[OW18E] Ready!")
+	startParser(&owon.OW18E{})
 }
 
 func main() {
@@ -67,9 +68,9 @@ func main() {
 
 	switch strings.TrimSpace(strings.ToLower(os.Args[1])) {
 	case "fs9721":
-		Fs9721lp3()
+		fs9721lp3()
 	case "ow18e":
-		Ow18e()
+		ow18e()
 	default:
 		log.Println("Invalid argument! valid argument: \"fs9721\" or \"ow18e\"")
 	}
@@ -77,7 +78,7 @@ func main() {
 	if bt.Connected() {
 		log.Println("Press <ENTER> to exit")
 		bufio.NewScanner(os.Stdin).Scan()
-		log.Println("disconnecting...")
 		bt.Disconnect()
+		log.Println("Desconnected!!")
 	}
 }

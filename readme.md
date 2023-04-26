@@ -13,7 +13,3 @@ Tested with Linux using golang 1.20.3.
 * Run `go run main.go <ow18e or fs9721>`
 * Watch terminal.
 * Press **ENTER** to disconnect bluetooth and close the program.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE file](LICENSE) for details.

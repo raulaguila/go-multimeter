@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-var (
+const (
 	dc         string = "00"
 	ac         string = "01"
 	diod       string = "10"
@@ -19,67 +19,72 @@ var (
 	voltage    string = "0000"
 	resistance string = "0001"
 	continuity string = "0010"
-	auto       string = "0100"
+	ncv        string = "0011"
+	auto       string = "10"
+	relative   string = "01"
 )
 
 type OW18E struct {
-	Bytearray []string
+	bytearray []byte
+	binarray  []string
 }
 
-func (m *OW18E) ShowByteArray(bytearray []byte) {
+func (m *OW18E) getBinArray() []string {
 	str := []string{}
-	for _, b := range bytearray {
-		str = append(str, m.toBintString(b))
+	for _, b := range m.bytearray {
+		str = append(str, fmt.Sprintf("%08b", b))
 	}
-	log.Printf("%v <-> %v \n", str, bytearray)
+	return str
 }
 
-func (m *OW18E) ProccessArray(bytearray []byte) (float64, string, []string) {
-	// m.ShowByteArray(bytearray)
+func (m *OW18E) ProccessArray(bytearray []byte, printArray bool) (float64, string, []string) {
+	m.bytearray = bytearray
+	m.binarray = m.getBinArray()
 
-	value := m.extractValue(bytearray)
-	unit := m.extractUnit(bytearray)
-	flags := m.extractFlags(bytearray)
+	value := m.extractValue()
+	unit := m.extractUnit()
+	flags := m.extractFlags()
+
+	if printArray {
+		log.Printf("%v <-> %v <-> %v %v %v\n", m.binarray, m.bytearray, value, unit, flags)
+	}
 
 	return value, unit, flags
 }
 
-func (m *OW18E) toBintString(b byte) string {
-	return fmt.Sprintf("%08b", b)
-}
-
-func (m *OW18E) extractValue(bytearray []byte) (ret float64) {
-	str := m.toBintString(bytearray[0])
+func (m *OW18E) extractValue() (ret float64) {
 	div := 10
-	switch str[5:] {
-	case "100":
+	mrange := m.binarray[0][5:]
+	switch mrange {
+	case "100": // range 2
 		div = 10000
-	case "011":
+	case "011": // range 20
 		div = 1000
-	case "010":
+	case "010": // range 200
 		div = 100
-	case "001":
+	case "001": // range 2000
 		div = 10
-	case "111":
-		ret = 0
+	case "111": // L
 		return
+	default:
+		log.Printf("\tRange not tracked: %v\n", mrange)
 	}
 
-	if bytearray[5] < 128 {
-		ret = ((float64(bytearray[5]) * 256) + float64(bytearray[4])) / float64(div)
+	if m.bytearray[5] < 128 {
+		ret = ((float64(m.bytearray[5]) * 256) + float64(m.bytearray[4])) / float64(div)
 	} else {
-		ret = ((((float64(bytearray[5]) - 128.0) * 256.0) + float64(bytearray[4])) / float64(div)) * -1
+		ret = ((((float64(m.bytearray[5]) - 128.0) * 256.0) + float64(m.bytearray[4])) / float64(div)) * -1
 	}
 
 	return
 }
 
-func (m *OW18E) extractUnit(bytearray []byte) (unit string) {
-	firstByte := m.toBintString(bytearray[0])
-	secondByte := m.toBintString(bytearray[1])
+func (m *OW18E) extractUnit() (unit string) {
+	firstByte := m.binarray[0]
+	secondByte := m.binarray[1]
 
 	unitRepresentation := firstByte[2:5]
-	finalFunction := firstByte[0:2] + secondByte[4:]
+	finalFunction := firstByte[:2] + secondByte[4:]
 
 	arrUnits := [][2]interface{}{
 		{unitRepresentation == nano, "n"},        // nano
@@ -98,6 +103,7 @@ func (m *OW18E) extractUnit(bytearray []byte) (unit string) {
 		{finalFunction == diod+resistance, "Hz"}, // Frequence
 		{finalFunction == diod+voltage, "A"},     // Current Measure
 		{finalFunction == cont+continuity, "Ω"},  // Continuity test
+		{finalFunction == cont+resistance, "%"},  // Percentage
 	}
 
 	for _, item := range arrUnits {
@@ -109,10 +115,10 @@ func (m *OW18E) extractUnit(bytearray []byte) (unit string) {
 	return
 }
 
-func (m *OW18E) extractFlags(bytearray []byte) (flags []string) {
-	firstByte := m.toBintString(bytearray[0])
-	secondByte := m.toBintString(bytearray[1])
-	thirdByte := m.toBintString(bytearray[2])
+func (m *OW18E) extractFlags() (flags []string) {
+	firstByte := m.binarray[0]
+	secondByte := m.binarray[1]
+	thirdByte := m.binarray[2]
 
 	funcRepresentation := firstByte[0:2]
 	finalFunction := funcRepresentation + secondByte[4:]
@@ -120,11 +126,17 @@ func (m *OW18E) extractFlags(bytearray []byte) (flags []string) {
 	arrFlags := [][2]interface{}{
 		{funcRepresentation == dc, "DC"},                      // DC Voltage Measure
 		{funcRepresentation == ac, "AC"},                      // AC Voltage Measure
-		{thirdByte[4:] == auto, "Auto"},                       // Auto range
+		{firstByte[5:] == "111", "L"},                         // L
+		{thirdByte[5:7] == auto, "Auto Mode"},                 // Auto Mode
+		{thirdByte[5:7] == relative, "Relative Mode"},         // Relative Mode
+		{thirdByte[7:] == "1", "Hold"},                        // Hold
 		{finalFunction == dc+continuity, "Temp celsius"},      // Temp celsius
 		{finalFunction == ac+continuity, "Temp fahrenheit"},   // Temp fahrenheit
+		{finalFunction == ac+resistance, "Capacity"},          // Capacitance Measure
+		{finalFunction == ac+ncv, "NCV Measure"},              // NCV Measure
 		{finalFunction == diod+continuity, "Diode test"},      // Diode test
 		{finalFunction == cont+continuity, "Continuity test"}, // Continuity test
+		{finalFunction == cont+resistance, "Percentage"},      // Percentage
 	}
 
 	for _, flag := range arrFlags {

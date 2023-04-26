@@ -1,56 +1,58 @@
-package fs9721lp3
+package fs9721
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 )
 
-var (
-	DeviceName         = "FS9721-LP3"
-	ServiceUUID        = [16]byte{0x00, 0x00, 0xff, 0xb0, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-	CharacteristicUUID = [16]byte{0x00, 0x00, 0xff, 0xb2, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb}
-)
-
-type Fs9721lp3 struct {
-	Bytearray []string
+type Fs9721 struct {
+	bytearray     []string
+	originalarray []byte
 }
 
-func (m *Fs9721lp3) AddToByteArray(bytearray []byte) (float64, string, []string) {
+func (m *Fs9721) ProccessArray(bytearray []byte, printArray bool) (float64, string, []string) {
 	if len(bytearray) == 8 {
-		m.Bytearray = m.Bytearray[:0]
+		m.bytearray = m.bytearray[:0]
+		m.originalarray = m.originalarray[:0]
 	}
 
-	if len(bytearray) == 8 || len(bytearray) == 6 {
+	value := 0.0
+	unit := ""
+	flags := []string{}
+
+	switch len(bytearray) {
+	case 6, 8:
 		for _, b := range bytearray {
 			aux := fmt.Sprintf("%08b", b)
-			m.Bytearray = append(m.Bytearray, aux[len(aux)-4:])
+			m.bytearray = append(m.bytearray, aux[len(aux)-4:])
+			m.originalarray = append(m.originalarray, b)
 		}
 
-		if len(m.Bytearray) == 14 {
-			return m.proccessArray(m.Bytearray)
+		if len(m.bytearray) == 14 {
+			value, unit, flags = m.proccessArray()
+		}
+
+		if len(m.bytearray) == 14 && printArray {
+			log.Printf("%v <-> %v <-> %v %v %v\n", m.bytearray, m.originalarray, value, unit, flags)
 		}
 	}
 
-	return 0, "", []string{}
+	return value, unit, flags
 }
 
-func (m *Fs9721lp3) proccessArray(bytearray []string) (float64, string, []string) {
-	str := strings.Join(bytearray, "")
-	if len(str) != 56 {
-		return 0, "", []string{}
-	}
+func (m *Fs9721) proccessArray() (float64, string, []string) {
+	str := strings.Join(m.bytearray, "")
 
 	value := m.extractValue(str)
 	unit := m.extractUnit(str)
 	flags := m.extractFlags(str)
 
-	// log.Printf("%v %v %v\n", value, unit, flags)
-
 	return value, unit, flags
 }
 
-func (m *Fs9721lp3) extractValue(str string) (ret float64) {
+func (m *Fs9721) extractValue(str string) (ret float64) {
 	digits := map[string]string{
 		"1111101": "0",
 		"0000101": "1",
@@ -76,21 +78,21 @@ func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 		str[29:36], // Digito 04
 	}
 
-	value := "0"
+	measured := "0"
 	for i, digit := range arrDigits {
 		switch i % 2 {
 		case 0:
 			if val, exist := digits[digit]; exist {
-				value += val
+				measured += val
 			}
 		case 1:
 			if digit == "1" {
-				value += "."
+				measured += "."
 			}
 		}
 	}
 
-	ret, _ = strconv.ParseFloat(value, 64)
+	ret, _ = strconv.ParseFloat(measured, 64)
 	if str[4:5] == "1" {
 		ret = ret * -1
 	}
@@ -98,7 +100,7 @@ func (m *Fs9721lp3) extractValue(str string) (ret float64) {
 	return
 }
 
-func (m *Fs9721lp3) extractUnit(str string) (unit string) {
+func (m *Fs9721) extractUnit(str string) (unit string) {
 	arrUnits := [][2]interface{}{
 		{str[37:38] == "1", "n"},  // nano
 		{str[36:37] == "1", "µ"},  // micro
@@ -123,7 +125,7 @@ func (m *Fs9721lp3) extractUnit(str string) (unit string) {
 	return
 }
 
-func (m *Fs9721lp3) extractFlags(str string) (flags []string) {
+func (m *Fs9721) extractFlags(str string) (flags []string) {
 	arrFlags := [][2]interface{}{
 		{str[0:1] == "1", "AC"},
 		{str[1:2] == "1" && str[53:54] == "0", "DC"},
@@ -136,6 +138,7 @@ func (m *Fs9721lp3) extractFlags(str string) (flags []string) {
 		{str[52:53] == "1", "Min"},
 		{str[55:56] == "1", "Max"},
 		{str[51:52] == "1", "LowBat"},
+		{str[21:28] == "1101000", "L"},
 	}
 
 	for _, flag := range arrFlags {

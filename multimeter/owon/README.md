@@ -4,7 +4,7 @@ This work was carried using bluetooth to connect to the multimeter and tracking 
 
 Tested with Owon - OW18E multimeter
 
-![](/screenshot/OW18E.png)
+![](/screenshot/ow18e.png)
 
 * ### Example message:
 
@@ -21,12 +21,12 @@ Tested with Owon - OW18E multimeter
 
         | 0-1 | func | -   | 2-4 | unit | -   | 5-7 | range |
         | --- | ---  | --- | --- | ---  | --- | --- | ---   |
-        | 00  | DC   |     | 001 | n    |     | 001 | 2000  |
-        | 01  | AC   |     | 010 | µ    |     | 010 | 200   |
-        | 10  | Diod |     | 011 | m    |     | 011 | 20    |
-        | 11  | Cont |     | 100 | 1    |     | 100 | 2     |
-        |     |      |     | 101 | k    |     | 111 | L     |
-        |     |      |     | 110 | M    |     |     |       |
+        | 00  | DC   |     | 001 | n    |     | 000 | NCV   |
+        | 01  | AC   |     | 010 | µ    |     | 001 | 2000  |
+        | 10  | Diod |     | 011 | m    |     | 010 | 200   |
+        | 11  | Cont |     | 100 | 1    |     | 011 | 20    |
+        |     |      |     | 101 | k    |     | 100 | 2     |
+        |     |      |     | 110 | M    |     | 111 | L     |
 
 * ### 2nd byte
 
@@ -39,18 +39,20 @@ Tested with Owon - OW18E multimeter
         | 1111 | -    |     | 0000 | Voltage     |
         |      |      |     | 0001 | Resistance  |
         |      |      |     | 0010 | Continuity  |
+        |      |      |     | 0011 | NCV         |
         |      |      |     | 0100 | Capacitance |
 
 * ### 3rd byte
 
     * 8 digits, ex: [00000100](#example-message)
-    * Digits (0, 1, 2, 3): Apparently they are not used [*](#ps)
-    * Digits (4, 5, 6, 7): Represents if Auto is enabled
+    * Digits (0, 1, 2, 3, 4): Apparently they are not used [*](#ps)
+    * Digits (5, 6): Represents if Auto or Relative mode is enabled
+    * Digits (7): Represents if Hold is activated
 
-        | 0-3  | func | -   | 4-7  | func     |
-        | ---  | ---  | --- | ---  | ---      |
-        | 0000 | -    |     | 0100 | Auto ON  |
-        |      |      |     | 0000 | Auto OFF |
+        | 0-4   | func | -   | 5-6 | func | -   | 7   | func |
+        | ---   | ---  | --- | --- | ---  | --- | --- | ---  |
+        | 00000 | -    |     | 10  | Auto |     | 1   | Hold |
+        |       |      |     | 01  | Rel  |     |     |      |
 
 * ### 4th byte
 
@@ -75,6 +77,7 @@ Tested with Owon - OW18E multimeter
         | [DC](#1st-byte) + [Continuity](#2nd-byte)   | Temperature         | ºC    |
         | [AC](#1st-byte) + [Continuity](#2nd-byte)   | Temperature         | ºF    |
         | [Cont](#1st-byte) + [Continuity](#2nd-byte) | Continuity test     | Ω     |
+        | [Cont](#1st-byte) + [Resistance](#2nd-byte) | Capacitance Measure | %     |
         | [Diod](#1st-byte) + [Continuity](#2nd-byte) | Diode test          | V     |
         | [Diod](#1st-byte) + [Resistance](#2nd-byte) | Frequence           | Hz    |
         | [DC](#1st-byte) + [Voltage](#2nd-byte)      | DC Voltage Measure  | V     |
@@ -82,6 +85,7 @@ Tested with Owon - OW18E multimeter
         | [DC](#1st-byte) + [Resistance](#2nd-byte)   | Resistance Measure  | Ω     |
         | [AC](#1st-byte) + [Resistance](#2nd-byte)   | Capacitance Measure | F     |
         | [Diod](#1st-byte) + [Voltage](#2nd-byte)    | Current Measure     | A     |
+        | [AC](#1st-byte) + [NCV](#2nd-byte)          | NCV Measure         | -     |
 
 * #### PS
 

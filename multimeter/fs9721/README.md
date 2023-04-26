@@ -6,7 +6,7 @@ Works with FS9721-LP3 based Bluetooth Multimeters, including:
 * Infurider YF-90EPD
 * HoldPeak HP-90EPD
 
-![](/screenshot/FS9721-LP3.png)
+![](/screenshot/fs9721lp3.png)
 
 
 * ### Example message:
@@ -19,5 +19,5 @@ Works with FS9721-LP3 based Bluetooth Multimeters, including:
     * Concatenate all last 4 digits of each converted byte into a string of size (6 + 8) * 4 = 56.
     * Each character in this string represents an element on the LCD multimeter as shown in the image:
 
-        ![](/screenshot/FS9721-LP3_LCD.jpg)
+        ![](/screenshot/fs9721lp3_LCD.jpg)
 
