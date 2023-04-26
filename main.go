@@ -32,32 +32,27 @@ func startBT(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byt
 	}
 }
 
-func startParser(m multimeter.Multimeter) {
+func startParser(m multimeter.Multimeter, printArray bool) {
 	go func(printArray bool) {
 		for bt.Connected() {
-			if printArray {
-				go m.ProccessArray(<-bt.ChReceived, printArray)
-				continue
-			}
-
 			val, unit, flags := m.ProccessArray(<-bt.ChReceived, printArray)
-			if unit != "" {
-				log.Printf("%v %v %v\n", val, unit, flags)
+			if unit != "" && !printArray {
+				log.Printf("%v %v [%v]\n", val, unit, strings.Join(flags, ", "))
 			}
 		}
-	}(false)
+	}(printArray)
 }
 
-func fs9721lp3() {
+func fs9721lp3(printArray bool) {
 	startBT(fs9721.DeviceName, fs9721.ServiceUUID, fs9721.CharacteristicUUID)
 	log.Println("[FS9721_LP3] Ready!")
-	startParser(&fs9721.Fs9721{})
+	startParser(&fs9721.Fs9721{}, printArray)
 }
 
-func ow18e() {
+func ow18e(printArray bool) {
 	startBT(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicUUID)
 	log.Println("[OW18E] Ready!")
-	startParser(&owon.OW18E{})
+	startParser(&owon.OW18E{}, printArray)
 }
 
 func main() {
@@ -66,13 +61,18 @@ func main() {
 		return
 	}
 
+	printArray := false
+	if len(os.Args) > 2 {
+		printArray = strings.ToLower(os.Args[2]) == "true"
+	}
+
 	switch strings.TrimSpace(strings.ToLower(os.Args[1])) {
 	case "fs9721":
-		fs9721lp3()
+		fs9721lp3(printArray)
 	case "ow18e":
-		ow18e()
+		ow18e(printArray)
 	default:
-		log.Println("Invalid argument! valid argument: \"fs9721\" or \"ow18e\"")
+		log.Println("Invalid argument! valid arguments: \"fs9721\" or \"ow18e\"")
 	}
 
 	if bt.Connected() {

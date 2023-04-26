@@ -33,7 +33,7 @@ func (m *Fs9721) ProccessArray(bytearray []byte, printArray bool) (value float64
 			flags = m.extractFlags(str)
 
 			if printArray {
-				log.Printf("%v <-> %v <-> %v %v %v\n", m.bytearray, m.originalarray, value, unit, flags)
+				log.Printf("%v <-> %v <-> %v %v [%v]\n", m.bytearray, m.originalarray, value, unit, strings.Join(flags, ", "))
 			}
 		}
 	}

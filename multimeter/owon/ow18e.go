@@ -3,30 +3,30 @@ package owon
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 const (
-	dc         string = "00"
-	ac         string = "01"
-	diod       string = "10"
-	cont       string = "11"
-	nano       string = "001"
-	micro      string = "010"
-	mili       string = "011"
-	one        string = "100"
-	kilo       string = "101"
-	mega       string = "110"
-	voltage    string = "0000"
-	resistance string = "0001"
-	continuity string = "0010"
-	ncv        string = "0011"
-	auto       string = "10"
-	relative   string = "01"
+	// First 2 bits of 1st byte
+	dc   = "00"
+	ac   = "01"
+	diod = "10"
+	cont = "11"
+
+	// Last 2 bits of 2nd byte
+	voltage    = "00"
+	resistance = "01"
+	continuity = "10"
+	ncv        = "11"
 )
 
 type OW18E struct {
-	bytearray []byte
-	binarray  []string
+	bytearray     []byte
+	binarray      []string
+	function      string
+	finalfunction string
+	unity         string
+	mrange        string
 }
 
 func (m *OW18E) getBinArray() []string {
@@ -38,73 +38,82 @@ func (m *OW18E) getBinArray() []string {
 }
 
 func (m *OW18E) ProccessArray(bytearray []byte, printArray bool) (value float64, unit string, flags []string) {
-	m.bytearray = bytearray
-	m.binarray = m.getBinArray()
+	m.bytearray = bytearray                          // Save byte array
+	m.binarray = m.getBinArray()                     // Convert byte array to bits string
+	m.unity = m.binarray[0][2:5]                     // Get unit
+	m.function = m.binarray[0][:2]                   // Get function
+	m.finalfunction = m.function + m.binarray[1][6:] // Get final function
+	m.mrange = m.binarray[0][5:]                     // Get range
 
 	value = m.extractValue()
 	unit = m.extractUnit()
 	flags = m.extractFlags()
 
 	if printArray {
-		log.Printf("%v <-> %v <-> %v %v %v\n", m.binarray, m.bytearray, value, unit, flags)
+		log.Printf("%v <-> %v <-> %v %v [%v]\n", m.binarray, m.bytearray, value, unit, strings.Join(flags, ", "))
 	}
 
 	return value, unit, flags
 }
 
+func (m *OW18E) calcValue(byte5 byte, byte4 byte, div float64, negative bool) (ret float64) {
+	ret = float64(byte5)
+	if negative {
+		ret -= 128
+	}
+
+	ret = ((ret * 256) + float64(byte4)) / div
+
+	if negative {
+		ret *= -1
+	}
+
+	return
+}
+
 func (m *OW18E) extractValue() (ret float64) {
-	div := 10
-	mrange := m.binarray[0][5:]
-	switch mrange {
+	switch m.mrange {
 	case "100": // range 2
-		div = 10000
+		ret = m.calcValue(m.bytearray[5], m.bytearray[4], 10000, m.bytearray[5] >= 128)
 	case "011": // range 20
-		div = 1000
+		ret = m.calcValue(m.bytearray[5], m.bytearray[4], 1000, m.bytearray[5] >= 128)
 	case "010": // range 200
-		div = 100
+		ret = m.calcValue(m.bytearray[5], m.bytearray[4], 100, m.bytearray[5] >= 128)
 	case "001": // range 2000
-		div = 10
+		ret = m.calcValue(m.bytearray[5], m.bytearray[4], 10, m.bytearray[5] >= 128)
+	case "000": // NCV
+		ret = float64(m.bytearray[4])
+		return
 	case "111": // L
 		return
 	default:
-		log.Printf("\tRange not tracked: %v\n", mrange)
-	}
-
-	if m.bytearray[5] < 128 {
-		ret = ((float64(m.bytearray[5]) * 256) + float64(m.bytearray[4])) / float64(div)
-	} else {
-		ret = ((((float64(m.bytearray[5]) - 128.0) * 256.0) + float64(m.bytearray[4])) / float64(div)) * -1
+		log.Printf("\tRange not tracked: %v\n", m.mrange)
+		return
 	}
 
 	return
 }
 
 func (m *OW18E) extractUnit() (unit string) {
-	firstByte := m.binarray[0]
-	secondByte := m.binarray[1]
-
-	unitRepresentation := firstByte[2:5]
-	finalFunction := firstByte[:2] + secondByte[4:]
-
 	arrUnits := [][2]interface{}{
-		{unitRepresentation == nano, "n"},        // nano
-		{unitRepresentation == micro, "µ"},       // micro
-		{unitRepresentation == mili, "m"},        // mili
-		{unitRepresentation == one, ""},          // 1
-		{unitRepresentation == kilo, "k"},        // kilo
-		{unitRepresentation == mega, "M"},        // Mega
-		{finalFunction == dc+continuity, "ºC"},   // Temp celsius
-		{finalFunction == dc+voltage, "V"},       // DC Voltage Measure
-		{finalFunction == dc+resistance, "Ω"},    // Resistance Measure
-		{finalFunction == ac+continuity, "ºF"},   // Temp fahrenheit
-		{finalFunction == ac+resistance, "F"},    // Capacitance Measure
-		{finalFunction == ac+voltage, "V"},       // AC Voltage Measure
-		{finalFunction == ac+ncv, "NVC"},         // Percentage
-		{finalFunction == diod+continuity, "V"},  // Diode test
-		{finalFunction == diod+resistance, "Hz"}, // Frequence
-		{finalFunction == diod+voltage, "A"},     // Current Measure
-		{finalFunction == cont+continuity, "Ω"},  // Continuity test
-		{finalFunction == cont+resistance, "%"},  // Percentage
+		{m.unity == "001", "n"},                    // nano
+		{m.unity == "010", "µ"},                    // micro
+		{m.unity == "011", "m"},                    // mili
+		{m.unity == "100", ""},                     // 1
+		{m.unity == "101", "k"},                    // kilo
+		{m.unity == "110", "M"},                    // Mega
+		{m.finalfunction == dc+continuity, "ºC"},   // Temp celsius
+		{m.finalfunction == dc+voltage, "V"},       // DC Voltage Measure
+		{m.finalfunction == dc+resistance, "Ω"},    // Resistance Measure
+		{m.finalfunction == ac+continuity, "ºF"},   // Temp fahrenheit
+		{m.finalfunction == ac+resistance, "F"},    // Capacitance Measure
+		{m.finalfunction == ac+voltage, "V"},       // AC Voltage Measure
+		{m.finalfunction == ac+ncv, "NVC"},         // NVC Measure
+		{m.finalfunction == diod+continuity, "V"},  // Diode test
+		{m.finalfunction == diod+resistance, "Hz"}, // Frequence
+		{m.finalfunction == diod+voltage, "A"},     // Current Measure
+		{m.finalfunction == cont+continuity, "Ω"},  // Continuity test
+		{m.finalfunction == cont+resistance, "%"},  // Percentage
 	}
 
 	for _, item := range arrUnits {
@@ -117,27 +126,21 @@ func (m *OW18E) extractUnit() (unit string) {
 }
 
 func (m *OW18E) extractFlags() (flags []string) {
-	firstByte := m.binarray[0]
-	secondByte := m.binarray[1]
-	thirdByte := m.binarray[2]
-
-	funcRepresentation := firstByte[0:2]
-	finalFunction := funcRepresentation + secondByte[4:]
-
 	arrFlags := [][2]interface{}{
-		{funcRepresentation == dc, "DC"},                      // DC Voltage Measure
-		{funcRepresentation == ac, "AC"},                      // AC Voltage Measure
-		{firstByte[5:] == "111", "L"},                         // L
-		{thirdByte[5:7] == auto, "Auto Mode"},                 // Auto Mode
-		{thirdByte[5:7] == relative, "Relative Mode"},         // Relative Mode
-		{thirdByte[7:] == "1", "Hold"},                        // Hold
-		{finalFunction == dc+continuity, "Temp celsius"},      // Temp celsius
-		{finalFunction == ac+continuity, "Temp fahrenheit"},   // Temp fahrenheit
-		{finalFunction == ac+resistance, "Capacity"},          // Capacitance Measure
-		{finalFunction == ac+ncv, "NCV Measure"},              // NCV Measure
-		{finalFunction == diod+continuity, "Diode test"},      // Diode test
-		{finalFunction == cont+continuity, "Continuity test"}, // Continuity test
-		{finalFunction == cont+resistance, "Percentage"},      // Percentage
+		{m.function == dc, "DC"},                                // DC Voltage Measure
+		{m.function == ac, "AC"},                                // AC Voltage Measure
+		{m.mrange == "111", "L"},                                // L
+		{m.finalfunction == dc+continuity, "Temp celsius"},      // Temp celsius
+		{m.finalfunction == ac+continuity, "Temp fahrenheit"},   // Temp fahrenheit
+		{m.finalfunction == ac+resistance, "Capacity"},          // Capacitance Measure
+		{m.finalfunction == ac+ncv, "NCV Measure"},              // NCV Measure
+		{m.finalfunction == diod+continuity, "Diode test"},      // Diode test
+		{m.finalfunction == cont+continuity, "Continuity test"}, // Continuity test
+		{m.finalfunction == cont+resistance, "Percentage"},      // Percentage
+		{m.binarray[2][4] == '1', "Low Battery"},                // Low Battery
+		{m.binarray[2][5] == '1', "Auto Range"},                 // Auto Range
+		{m.binarray[2][6] == '1', "Relative Mode"},              // Relative Mode
+		{m.binarray[2][7] == '1', "Hold"},                       // Hold
 	}
 
 	for _, flag := range arrFlags {
