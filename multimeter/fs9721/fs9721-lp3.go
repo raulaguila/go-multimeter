@@ -26,22 +26,17 @@ func (m *Fs9721) ProccessArray(bytearray []byte, printArray bool) (value float64
 		}
 
 		if len(m.bytearray) == 14 {
-			value, unit, flags = m.proccessArray()
+			str := strings.Join(m.bytearray, "")
+
+			value = m.extractValue(str)
+			unit = m.extractUnit(str)
+			flags = m.extractFlags(str)
+
 			if printArray {
 				log.Printf("%v <-> %v <-> %v %v %v\n", m.bytearray, m.originalarray, value, unit, flags)
 			}
 		}
 	}
-
-	return value, unit, flags
-}
-
-func (m *Fs9721) proccessArray() (float64, string, []string) {
-	str := strings.Join(m.bytearray, "")
-
-	value := m.extractValue(str)
-	unit := m.extractUnit(str)
-	flags := m.extractFlags(str)
 
 	return value, unit, flags
 }
