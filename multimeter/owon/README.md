@@ -12,7 +12,7 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 * Example received: [ 98 240 4 0 [147 49](#5th--6th-bytes) ]
 * Convert to 8-digit binary: [ [01100010](#1st-byte) [11110000](#2nd-byte) [00000100](#3rd-byte) [00000000](#4th-byte) 10010011 00110001 ]
 * Final output struct: `<value> <unit> <flags>`
-* Final output of example: `126.91 V [AC, Auto Range]`
+* Final output of example: `126.91 V ["AC" "Auto Range"]`
 
 ### 1st Byte
 
@@ -72,7 +72,7 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 ### Final function
 
 * Combining the 1st and 2nd byte items, it has the final function.
-* [First two bits of 1st byte](#1st-byte) + [last two of 2nd](#2nd-byte).
+* [`First two bits of 1st byte`](#1st-byte) + [`Last two bits of 2nd byte`](#2nd-byte).
 
     | 1st Byte | 2nd Byte   | Final function      | Symbol |
     | ---:     | :---       | :---                | :---:  |

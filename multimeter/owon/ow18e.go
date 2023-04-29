@@ -8,16 +8,16 @@ import (
 
 const (
 	// First 2 bits of 1st byte
-	dc   = "00"
-	ac   = "01"
-	diod = "10"
-	cont = "11"
+	dc   string = "00"
+	ac   string = "01"
+	diod string = "10"
+	cont string = "11"
 
 	// Last 2 bits of 2nd byte
-	voltage    = "00"
-	resistance = "01"
-	continuity = "10"
-	ncv        = "11"
+	voltage    string = "00"
+	resistance string = "01"
+	continuity string = "10"
+	ncv        string = "11"
 )
 
 type OW18E struct {
