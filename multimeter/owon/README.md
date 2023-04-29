@@ -18,9 +18,9 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 
 * 8 bits, ex: [01100010](#example-message)
 
-    * Bits (0, 1): Represents the function (On example: *01*)
-    * Bits (2, 3, 4): Represents the unit of measure (On example: *100*)
-    * Bits (5, 6, 7): Represents the range of the measured value (On example: *010*)
+    * Bits (0, 1): Represents the function (In example: *01*)
+    * Bits (2, 3, 4): Represents the unit of measure (In example: *100*)
+    * Bits (5, 6, 7): Represents the range of the measured value (In example: *010*)
 
     | 0-1 | func | -   | 2-4 | unit | -   | 5-7 | range |
     | --- | ---  | --- | --- | ---  | --- | --- | ---   |
