@@ -8,7 +8,7 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 
 ### Example message:
 
-* Receive a 5-byte array
+* Receive a 6-byte array
 * Example received: [ 98 240 4 0 [147 49](#5th--6th-bytes) ]
 * Convert to 8-digit binary: [ [01100010](#1st-byte) [11110000](#2nd-byte) [00000100](#3rd-byte) [00000000](#4th-byte) 10010011 00110001 ]
 * Final output struct: `<value> <unit> <flags>`
