@@ -5,22 +5,23 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/raulaguila/go-multimeter/bluetooth/enum"
 	"tinygo.org/x/bluetooth"
 )
 
 type Bluetooth struct {
-	ChReceived chan []byte
-	ChWrite    chan []byte
-	connected  bool
-	adapter    *bluetooth.Adapter
-	chScan     chan bluetooth.ScanResult
-	device     *bluetooth.Device
-	srvcs      []bluetooth.DeviceService
-	chars      []bluetooth.DeviceCharacteristic
+	ChReceived      chan []byte
+	ChWrite         chan []byte
+	chScan          chan bluetooth.ScanResult
+	connected       bool
+	adapter         *bluetooth.Adapter
+	device          *bluetooth.Device
+	characteristics [2]bluetooth.DeviceCharacteristic
 }
 
-func (b *Bluetooth) Enable() error {
+func (b *Bluetooth) enable() error {
 	b.adapter = bluetooth.DefaultAdapter
 	return b.adapter.Enable()
 }
@@ -35,24 +36,31 @@ func (b *Bluetooth) find(deviceName string) {
 	})
 }
 
+func (b *Bluetooth) StopScan() error {
+	return b.adapter.StopScan()
+}
+
 func (b *Bluetooth) Connected() bool {
 	return b.connected
 }
 
-func (b *Bluetooth) Disconnect() (err error) {
-	err = nil
-
+func (b *Bluetooth) Disconnect() error {
 	if b.connected {
 		b.connected = false
-		err = b.device.Disconnect()
+		time.Sleep(100 * time.Millisecond)
+		return b.device.Disconnect()
 	}
 
-	return
+	return nil
 }
 
 func (b *Bluetooth) Connect(ctx context.Context, deviceName string) (err error) {
 	err = nil
 	if !b.connected {
+		if err = b.enable(); err != nil {
+			return
+		}
+
 		b.find(deviceName)
 
 		select {
@@ -68,10 +76,6 @@ func (b *Bluetooth) Connect(ctx context.Context, deviceName string) (err error) 
 	return
 }
 
-func (b *Bluetooth) StopScan() error {
-	return b.adapter.StopScan()
-}
-
 func (b *Bluetooth) ScanDevices() {
 	go b.adapter.Scan(func(adapter *bluetooth.Adapter, result bluetooth.ScanResult) {
 		log.Println(result, result.LocalName())
@@ -79,20 +83,21 @@ func (b *Bluetooth) ScanDevices() {
 }
 
 func (b *Bluetooth) ListUUIDs() error {
-	srvcs, err := b.device.DiscoverServices(nil)
+	services, err := b.device.DiscoverServices(nil)
 	if err != nil {
 		return err
 	}
 
-	for _, srvc := range srvcs {
-		fmt.Printf("Service UUID: %v\n", srvc.UUID())
-		char, err := srvc.DiscoverCharacteristics(nil)
+	for _, service := range services {
+		fmt.Printf("Service UUID: %v\n", service.UUID())
+		characteristics, err := service.DiscoverCharacteristics(nil)
 		if err != nil {
 			return err
 		}
 
-		for _, c := range char {
-			fmt.Printf(" - Characteristic UUID: %v\n", c.UUID())
+		for _, characteristic := range characteristics {
+			fmt.Printf(" - Characteristic UUID: %v\n", characteristic.UUID())
+			fmt.Printf("   - Properties: %v\n\n", characteristic.Properties())
 		}
 
 		fmt.Println("")
@@ -101,76 +106,60 @@ func (b *Bluetooth) ListUUIDs() error {
 	return nil
 }
 
-func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err error) {
-	err = nil
-
+func (b *Bluetooth) getCharacteristic(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (*bluetooth.DeviceCharacteristic, error) {
 	if !b.connected {
-		err = errors.New("bluetooth not connected")
-		return
+		return nil, errors.New("bluetooth not connected")
 	}
 
-	b.srvcs, err = b.device.DiscoverServices([]bluetooth.UUID{bluetooth.NewUUID(ServiceUUID)})
+	services, err := b.device.DiscoverServices([]bluetooth.UUID{bluetooth.NewUUID(ServiceUUID)})
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if len(b.srvcs) == 0 {
-		err = errors.New("could not find service")
-		return
+	if len(services) == 0 {
+		return nil, errors.New("could not find service")
 	}
 
-	b.chars, err = b.srvcs[0].DiscoverCharacteristics([]bluetooth.UUID{bluetooth.NewUUID(CharacteristicUUID)})
+	characteristics, err := services[0].DiscoverCharacteristics([]bluetooth.UUID{bluetooth.NewUUID(CharacteristicUUID)})
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	if len(b.chars) == 0 {
-		err = errors.New("could not find characteristic")
-		return
+	if len(characteristics) == 0 {
+		return nil, errors.New("could not find characteristic")
 	}
 
+	return &characteristics[0], nil
+}
+
+func (b *Bluetooth) StartNotifier(ServiceUUID [16]byte, CharacteristicUUID [16]byte) error {
+	characteristic, err := b.getCharacteristic(ServiceUUID, CharacteristicUUID)
+	if err != nil {
+		return err
+	}
+
+	b.characteristics[enum.Reader] = *characteristic
 	b.ChReceived = make(chan []byte, 1)
-	b.chars[0].EnableNotifications(func(byteArray []byte) {
+	b.characteristics[enum.Reader].EnableNotifications(func(byteArray []byte) {
 		b.ChReceived <- byteArray
 	})
 
-	return
+	return nil
 }
 
-func (b *Bluetooth) Write(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err error) {
-	err = nil
-
-	if !b.connected {
-		err = errors.New("bluetooth not connected")
-		return
-	}
-
-	b.srvcs, err = b.device.DiscoverServices([]bluetooth.UUID{bluetooth.NewUUID(ServiceUUID)})
+func (b *Bluetooth) StartWriter(ServiceUUID [16]byte, CharacteristicUUID [16]byte) error {
+	characteristic, err := b.getCharacteristic(ServiceUUID, CharacteristicUUID)
 	if err != nil {
-		return
+		return err
 	}
 
-	if len(b.srvcs) == 0 {
-		err = errors.New("could not find service")
-		return
-	}
-
-	b.chars, err = b.srvcs[0].DiscoverCharacteristics([]bluetooth.UUID{bluetooth.NewUUID(CharacteristicUUID)})
-	if err != nil {
-		return
-	}
-
-	if len(b.chars) == 0 {
-		err = errors.New("could not find characteristic")
-		return
-	}
-
+	b.characteristics[enum.Writer] = *characteristic
 	b.ChWrite = make(chan []byte, 1)
 	go func() {
 		for b.connected {
-			b.chars[0].WriteWithoutResponse(<-b.ChWrite)
+			b.characteristics[enum.Writer].WriteWithoutResponse(<-b.ChWrite)
 		}
 	}()
 
-	return
+	return nil
 }

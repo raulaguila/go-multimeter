@@ -8,6 +8,6 @@ type MultimeterButtons interface {
 	Select() []byte
 	Auto() []byte
 	Range() []byte
-	Led() []byte
+	Light() []byte
 	Relative() []byte
 }

@@ -165,7 +165,7 @@ func (m *OW18E) Range() []byte {
 	return []byte{2, 1}
 }
 
-func (m *OW18E) Led() []byte {
+func (m *OW18E) Light() []byte {
 	return []byte{3, 0}
 }
 
