@@ -96,7 +96,8 @@ func main() {
 	case "ow18e":
 		ow18e(printArray)
 	default:
-		log.Println("Invalid argument!\nValid arguments: \"fs9721\" or \"ow18e\"")
+		log.Println("Invalid argument!")
+		log.Println("Valid arguments: \"fs9721\" or \"ow18e\"")
 	}
 
 	if bt.Connected() {

@@ -97,7 +97,6 @@ func (b *Bluetooth) ListUUIDs() error {
 
 		for _, characteristic := range characteristics {
 			fmt.Printf(" - Characteristic UUID: %v\n", characteristic.UUID())
-			fmt.Printf("   - Properties: %v\n\n", characteristic.Properties())
 		}
 
 		fmt.Println("")
