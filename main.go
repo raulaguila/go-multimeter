@@ -16,7 +16,7 @@ import (
 
 var bt = bluetooth.Bluetooth{}
 
-func startBT(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byte) {
+func startBTRead(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byte) {
 	if err := bt.Enable(); err != nil {
 		panic(err)
 	}
@@ -32,6 +32,22 @@ func startBT(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byt
 	}
 }
 
+func startBTWrite(deviceName string, ServiceUUID [16]byte, CharacteristicUUID [16]byte) {
+	if err := bt.Enable(); err != nil {
+		panic(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := bt.Connect(ctx, deviceName); err != nil {
+		panic(err)
+	}
+
+	if err := bt.Write(ServiceUUID, CharacteristicUUID); err != nil {
+		panic(err)
+	}
+}
+
 func startParser(m multimeter.Multimeter, printArray bool) {
 	go func(printArray bool) {
 		for bt.Connected() {
@@ -43,16 +59,40 @@ func startParser(m multimeter.Multimeter, printArray bool) {
 	}(printArray)
 }
 
+func write(m multimeter.MultimeterButtons) {
+	bt.ChWrite <- m.Select()
+	time.Sleep(2 * time.Second)
+
+	bt.ChWrite <- m.Auto()
+	time.Sleep(2 * time.Second)
+
+	bt.ChWrite <- m.Range()
+	time.Sleep(2 * time.Second)
+
+	bt.ChWrite <- m.Range()
+	time.Sleep(2 * time.Second)
+
+	bt.ChWrite <- m.Range()
+	time.Sleep(2 * time.Second)
+
+	bt.ChWrite <- m.Range()
+	time.Sleep(2 * time.Second)
+}
+
 func fs9721lp3(printArray bool) {
-	startBT(fs9721.DeviceName, fs9721.ServiceUUID, fs9721.CharacteristicUUID)
+	startBTRead(fs9721.DeviceName, fs9721.ServiceUUID, fs9721.CharacteristicNotifyUUID)
 	log.Println("[FS9721_LP3] Ready!")
 	startParser(&fs9721.Fs9721{}, printArray)
 }
 
 func ow18e(printArray bool) {
-	startBT(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicUUID)
+	startBTRead(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicNotifyUUID)
 	log.Println("[OW18E] Ready!")
 	startParser(&owon.OW18E{}, printArray)
+
+	// Example to send command to multimeter
+	// startBTWrite(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicWriteUUID)
+	// write(&owon.OW18E{})
 }
 
 func main() {

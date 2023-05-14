@@ -1,4 +1,4 @@
-# Bluetooth communication protocol 
+# Bluetooth communication protocol
 
 This work was carried using bluetooth to connect to the multimeter and tracking the message bytes in each multimeter function.
 
@@ -18,9 +18,9 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 
 * 8 bits, ex: [01100010](#example-message)
 
-    * Bits (0, 1): Represents the function (In example: *01*)
-    * Bits (2, 3, 4): Represents the unit of measure (In example: *100*)
-    * Bits (5, 6, 7): Represents the range of the measured value (In example: *010*)
+    * Bits (0, 1): Represents the function (On example: *01*)
+    * Bits (2, 3, 4): Represents the unit of measure (On example: *100*)
+    * Bits (5, 6, 7): Represents the range of the measured value (On example: *010*)
 
     | 0-1 | func | -   | 2-4 | unit | -   | 5-7 | range |
     | --- | ---  | --- | --- | ---  | --- | --- | ---   |
@@ -63,7 +63,7 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 
 ### 5th & 6th Bytes
 
-* Ex: [\[... 147 49\]](#example-message)
+* Ex: [\[... **147** **49**\]](#example-message)
 * Represents the measurement value
 * Use them without converting to binary
 * 6th byte counts the overflow of 5th byte
@@ -72,7 +72,7 @@ Tested with [Owon - OW18E Digital Multimeter](https://owon.com.hk/products_owon_
 ### Final function
 
 * Combining the 1st and 2nd byte items, it has the final function.
-* [`First two bits of 1st byte`](#1st-byte) + [`Last two bits of 2nd byte`](#2nd-byte).
+* [`First two bits of 1st byte`](#1st-byte) + [`last two of 2nd`](#2nd-byte).
 
     | 1st Byte | 2nd Byte   | Final function      | Symbol |
     | ---:     | :---       | :---                | :---:  |

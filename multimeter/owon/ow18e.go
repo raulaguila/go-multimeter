@@ -151,3 +151,28 @@ func (m *OW18E) extractFlags() (flags []string) {
 
 	return
 }
+
+// Buttons command
+func (m *OW18E) Select() []byte {
+	return []byte{1, 0}
+}
+
+func (m *OW18E) Auto() []byte {
+	return []byte{2, 0}
+}
+
+func (m *OW18E) Range() []byte {
+	return []byte{2, 1}
+}
+
+func (m *OW18E) Led() []byte {
+	return []byte{3, 0}
+}
+
+func (m *OW18E) Hold() []byte {
+	return []byte{3, 1}
+}
+
+func (m *OW18E) Relative() []byte {
+	return []byte{4, 0}
+}

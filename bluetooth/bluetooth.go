@@ -11,6 +11,7 @@ import (
 
 type Bluetooth struct {
 	ChReceived chan []byte
+	ChWrite    chan []byte
 	connected  bool
 	adapter    *bluetooth.Adapter
 	chScan     chan bluetooth.ScanResult
@@ -132,6 +133,44 @@ func (b *Bluetooth) Read(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err
 	b.chars[0].EnableNotifications(func(byteArray []byte) {
 		b.ChReceived <- byteArray
 	})
+
+	return
+}
+
+func (b *Bluetooth) Write(ServiceUUID [16]byte, CharacteristicUUID [16]byte) (err error) {
+	err = nil
+
+	if !b.connected {
+		err = errors.New("bluetooth not connected")
+		return
+	}
+
+	b.srvcs, err = b.device.DiscoverServices([]bluetooth.UUID{bluetooth.NewUUID(ServiceUUID)})
+	if err != nil {
+		return
+	}
+
+	if len(b.srvcs) == 0 {
+		err = errors.New("could not find service")
+		return
+	}
+
+	b.chars, err = b.srvcs[0].DiscoverCharacteristics([]bluetooth.UUID{bluetooth.NewUUID(CharacteristicUUID)})
+	if err != nil {
+		return
+	}
+
+	if len(b.chars) == 0 {
+		err = errors.New("could not find characteristic")
+		return
+	}
+
+	b.ChWrite = make(chan []byte, 1)
+	go func() {
+		for b.connected {
+			b.chars[0].WriteWithoutResponse(<-b.ChWrite)
+		}
+	}()
 
 	return
 }
