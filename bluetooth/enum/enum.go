@@ -1,6 +1,6 @@
 package enum
 
-type mode int8
+type mode uint8
 
 const (
 	Reader mode = iota
