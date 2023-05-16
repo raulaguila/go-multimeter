@@ -74,7 +74,7 @@ func ow18e(printArray bool) {
 	go startParser(&owon.OW18E{}, printArray)
 
 	// Example to send command to multimeter
-	// startBTWriter(owon.DeviceName, owon.ServiceUUID, owon.CharacteristicWriteUUID)
+	// startBTWriter(owon.ServiceUUID, owon.CharacteristicWriteUUID)
 	// write(&owon.OW18E{})
 }
 
