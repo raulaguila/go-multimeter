@@ -12,7 +12,7 @@ import (
 )
 
 type Bluetooth struct {
-	ChReceived      chan []byte
+	ChNotifier      chan []byte
 	ChWrite         chan []byte
 	chScan          chan bluetooth.ScanResult
 	connected       bool
@@ -138,9 +138,9 @@ func (b *Bluetooth) StartNotifier(ServiceUUID [16]byte, CharacteristicUUID [16]b
 	}
 
 	b.characteristics[enum.Reader] = *characteristic
-	b.ChReceived = make(chan []byte, 1)
+	b.ChNotifier = make(chan []byte, 1)
 	b.characteristics[enum.Reader].EnableNotifications(func(byteArray []byte) {
-		b.ChReceived <- byteArray
+		b.ChNotifier <- byteArray
 	})
 
 	return nil

@@ -4,7 +4,11 @@ Get BLE Multimeter data to PC.
 
 Tested with Owon [OW18E](/multimeter/owon/README.md) multimeter and with [FS9721-LP3](/multimeter/fs9721/README.md) based bluetooth multimeters.
 
-Tested with Linux using golang 1.20.3.
+Tested with Linux using golang 1.20.
+
+## Requirements
+
+[![Golang](https://img.shields.io/badge/Golang-v1.20-%2300ADD8.svg?style=flat&logo=go&logoColor=2300ADD8&labelColor=0D1117)](https://go.dev/)
 
 ## Quickstart
 

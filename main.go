@@ -38,7 +38,7 @@ func startBTWriter(ServiceUUID [16]byte, CharacteristicUUID [16]byte) {
 
 func startParser(m multimeter.Multimeter, printArray bool) {
 	for bt.Connected() {
-		val, unit, flags := m.ProccessArray(<-bt.ChReceived, printArray)
+		val, unit, flags := m.ProccessArray(<-bt.ChNotifier, printArray)
 		if unit != "" && !printArray {
 			log.Printf("%v %v [%v]\n", val, unit, strings.Join(flags, ", "))
 		}
